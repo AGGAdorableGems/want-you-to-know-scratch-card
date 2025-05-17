@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Heart Scratch Card</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+SC:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Cormorant SC', serif;
+      background: #f3e5d2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #fffaf3;
+      border-radius: 20px;
+      padding: 40px 20px;
+      width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .note {
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.8em;
+      margin-bottom: 30px;
+      color: #5e4033;
+      line-height: 1.4em;
+    }
+
+    .heart-container {
+      position: relative;
+      width: 300px;
+      height: 280px;
+      margin: 0 auto;
+    }
+
+    #scratchCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      border-radius: 20px;
+    }
+
+    .message {
+      position: absolute;
+      top: 90px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Cormorant SC', serif;
+      font-weight: bold;
+      font-size: 1.3em;
+      color: #333;
+      z-index: 1;
+      line-height: 1.4em;
+      padding: 0 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="note">
+    I thought about you<br>
+    and wanted you to know…
+  </div>
+  <div class="heart-container">
+    <div class="message">
+      You are not<br>
+      alone, even when<br>
+      it feels that way.
+    </div>
+    <canvas id="scratchCanvas" width="300" height="280"></canvas>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById("scratchCanvas");
+  const ctx = canvas.getContext("2d");
+
+  // Gradient shiny brown fill
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, "#8b5e3c");
+  gradient.addColorStop(0.5, "#a47148");
+  gradient.addColorStop(1, "#cba987");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Big heart shape
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.beginPath();
+  ctx.moveTo(150, 100);
+  ctx.bezierCurveTo(150, 30, 270, 30, 270, 100);
+  ctx.bezierCurveTo(270, 190, 150, 250, 150, 270);
+  ctx.bezierCurveTo(150, 250, 30, 190, 30, 100);
+  ctx.bezierCurveTo(30, 30, 150, 30, 150, 100);
+  ctx.closePath();
+  ctx.fill();
+
+  // Scratch logic
+  ctx.globalCompositeOperation = "destination-out";
+  let isDrawing = false;
+
+  function scratch(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2, false);
+    ctx.fill();
+  }
+
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mousemove', e => isDrawing && scratch(e));
+
+  canvas.addEventListener('touchstart', () => isDrawing = true);
+  canvas.addEventListener('touchend', () => isDrawing = false);
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (isDrawing) scratch(e);
+  }, { passive: false });
+</script>
+
+</body>
+</html>
